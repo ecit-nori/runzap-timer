@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>体幹タイマー</title>
+<title>体幹・ストレッチタイマー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -69,22 +69,24 @@
 
 <!-- 選ぶ画面 -->
 <div id="setup">
-  <h1>体幹タイマー</h1>
+  <h1>体幹・ストレッチタイマー</h1>
   <div class="tabs" id="tabs">
     <div class="tab" data-p="run">走った日<small>体幹</small></div>
     <div class="tab" data-p="gym">月・金<small>体幹＋筋トレ</small></div>
     <div class="tab" data-p="tired">疲れた日<small>2つだけ</small></div>
+    <div class="tab" data-p="am">朝<small>ストレッチ</small></div>
+    <div class="tab" data-p="pm">夜<small>ストレッチ＋足裏</small></div>
   </div>
   <h2>メニュー（「必須」は外せない）</h2>
   <div id="list"></div>
   <h2>設定</h2>
   <div class="opts">
-    <label for="sets">セット数</label>
-    <select id="sets"><option value="1">1セット（最初の1〜2週）</option><option value="2" selected>2セット</option></select>
-    <label for="plankSec">プランクの時間</label>
-    <select id="plankSec"><option value="30" selected>30秒</option><option value="45">45秒</option><option value="60">60秒</option></select>
-    <label for="rest">種目の間の休み</label>
-    <select id="rest"><option value="10" selected>10秒</option><option value="20">20秒</option><option value="30">30秒</option></select>
+    <label for="sets" class="coreOnly">セット数</label>
+    <select id="sets" class="coreOnly"><option value="1">1セット（最初の1〜2週）</option><option value="2" selected>2セット</option></select>
+    <label for="plankSec" class="coreOnly">プランクの時間</label>
+    <select id="plankSec" class="coreOnly"><option value="30" selected>30秒</option><option value="45">45秒</option><option value="60">60秒</option></select>
+    <label for="rest" class="coreOnly">種目の間の休み</label>
+    <select id="rest" class="coreOnly"><option value="10" selected>10秒</option><option value="20">20秒</option><option value="30">30秒</option></select>
     <label for="voice">声で読む</label>
     <select id="voice"><option value="1" selected>読む</option><option value="0">読まない</option></select>
   </div>
@@ -150,20 +152,65 @@ const EX = [
   {id:'single', name:'片脚スクワット', group:'筋トレ', must:false, gymOnly:true, from:'2026-12-01', type:'reps', reps:10, tempo:4, sides:true,
    how:['いすの前で片足で立つ','いすに座るまで、ゆっくりしゃがむ','同じ足で立ち上がる'],
    ng:'ひざが内側に入る'},
+  // ===== 朝ストレッチ（カレンダー「朝ストレッチ（5分）」） =====
+  {id:'shoulder', name:'肩回し', group:'朝ストレッチ', must:true, type:'reps', reps:20, tempo:2,
+   how:['両手の指先を肩にのせる','ひじで大きな円をかくように回す','前回し10回 → 後ろ回し10回'],
+   ng:'首をすくめる（肩の力を抜く）'},
+  {id:'blade', name:'肩甲骨寄せ', group:'朝ストレッチ', must:true, type:'reps', reps:10, tempo:3,
+   how:['両ひじを90度に曲げて、体の横に置く','胸を張って、左右の肩甲骨を背中の真ん中に寄せる','2秒止めて、ゆるめる'],
+   ng:'腰を反らせる'},
+  {id:'cat', name:'キャット＆カウ', group:'朝ストレッチ', must:true, type:'reps', reps:10, tempo:4,
+   how:['四つんばい（手は肩の真下、ひざは股関節の真下）','息を吐きながら背中を丸め、おへそをのぞく','息を吸いながら背中を反らせ、前を見る'],
+   ng:'反動をつける（ゆっくり）'},
+  // ===== 夜ストレッチ＋足裏ケア（カレンダー「夜ストレッチ＋足裏ケア（10分）」） =====
+  {id:'hams', name:'太ももの裏', group:'夜ストレッチ', must:true, type:'time', sec:60, sides:true, sideText:'脚を伸ばす',
+   how:['床に座り、伸ばす脚を前にまっすぐ出す。反対の脚は曲げる','背中を丸めず、股関節から体を前に倒す','痛気持ちいいところで止めて、息を吐きながら'],
+   ng:'背中を丸めて手をつま先に伸ばす'},
+  {id:'hipf', name:'股関節の前側', group:'夜ストレッチ', must:true, type:'time', sec:60, sides:true, sideText:'ひざを床に',
+   how:['片ひざ立ち（床のひざの下にタオル）','上半身をまっすぐ立て、お尻をキュッと締める','体重を前の脚にのせ、脚の付け根の前を伸ばす'],
+   ng:'腰を反らせる'},
+  {id:'calfs', name:'ふくらはぎ（ひざを伸ばす）', group:'夜ストレッチ', must:true, type:'time', sec:30, sides:true, sideText:'脚を後ろに',
+   how:['壁に両手をつき、伸ばす脚を後ろに大きく1歩引く','後ろのかかとを床につけたまま、前のひざを曲げて体重を前へ','ふくらはぎの上の方が伸びる'],
+   ng:'後ろのかかとが浮く'},
+  {id:'calfb', name:'ふくらはぎ（ひざを曲げる）', group:'夜ストレッチ', must:true, type:'time', sec:30, sides:true, sideText:'脚を後ろに',
+   how:['同じ姿勢から、後ろのひざも少し曲げて腰を落とす','アキレス腱に近い、下の方が伸びる'],
+   ng:'かかとが浮く'},
+  {id:'ball', name:'足裏のボール転がし', group:'足裏ケア', must:true, type:'time', sec:60, sides:true, sideText:'足裏',
+   how:['いすに座り、ゴルフボールかテニスボールを足裏に置く','前後にゆっくり転がす','土踏まずのかかと側と、小指の付け根のまわりを丁寧に'],
+   ng:'痛いほど強く押す'},
+  {id:'chest', name:'胸', group:'夜ストレッチ', must:false, type:'time', sec:30, sides:true, sideText:'腕を壁に',
+   how:['壁の横に立ち、ひじを肩の高さで壁につける','体を壁と反対側にひねる','胸の前が伸びる'],
+   ng:'肩をすくめる'},
+  {id:'shld', name:'肩', group:'夜ストレッチ', must:false, type:'time', sec:30, sides:true, sideText:'腕を伸ばす',
+   how:['伸ばす腕を胸の前でまっすぐ横に伸ばす','反対の腕で胸に引き寄せる','肩の後ろが伸びる'],
+   ng:'体ごとひねる'},
+  {id:'neck', name:'首', group:'夜ストレッチ', must:false, type:'time', sec:30, sides:true, sideText:'に倒す',
+   how:['片手で頭の反対側を持つ','ゆっくり横に倒す','反対の肩は下げたまま'],
+   ng:'強く引っ張る'},
+  {id:'glute', name:'お尻', group:'夜ストレッチ', must:false, type:'time', sec:30, sides:true, sideText:'足首をひざに',
+   how:['あお向けで両ひざを立てる','足首を反対のひざにのせて「4」の形','下の太ももを抱えて胸に引き寄せる'],
+   ng:'腰が床から浮く'},
+  {id:'towel', name:'タオルギャザー', group:'足裏ケア', must:false, type:'time', sec:30, sides:true, sideText:'足',
+   how:['床にタオルを置き、端に足をのせる','足の指でタオルをたぐり寄せる','足裏の筋肉を使う'],
+   ng:'かかとが浮く'},
 ];
 const PRESET = {
   run:   {must:['plank','hip'], show:['plank','hip','side','bird','calf']},
   gym:   {must:['plank','hip','squat','lunge'], show:['plank','hip','side','bird','calf','squat','lunge','single']},
   tired: {must:['plank','hip'], show:['plank','hip']},
+  am:    {must:['shoulder','blade','cat'], show:['shoulder','blade','cat'], stretch:true, title:'朝ストレッチ'},
+  pm:    {must:['hams','hipf','calfs','calfb','ball'], show:['hams','hipf','calfs','calfb','ball','chest','shld','neck','glute','towel'], stretch:true, title:'夜ストレッチ'},
 };
 const $ = id => document.getElementById(id);
 const byId = id => EX.find(e => e.id === id);
 const today = new Date();
-let preset = (today.getDay() === 1 || today.getDay() === 5) ? 'gym' : 'run';
+const hr = today.getHours();
+let preset = (hr >= 4 && hr < 11) ? 'am' : (today.getDay() === 1 || today.getDay() === 5) ? 'gym' : 'run';
 const chosen = {}; // 任意の種目のチェック
 
 function drawList() {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.p === preset));
+  document.querySelectorAll('.coreOnly').forEach(x => x.style.display = PRESET[preset].stretch ? 'none' : '');
   const P = PRESET[preset];
   $('list').innerHTML = P.show.map(id => {
     const e = byId(id), must = P.must.includes(id);
@@ -190,7 +237,7 @@ function selected() {
 }
 function exSec(e) { return e.type === 'time' ? (e.id === 'plank' ? +$('plankSec').value : e.sec) : e.reps * e.tempo; }
 function buildPlan() {
-  const sets = +$('sets').value, rest = +$('rest').value, list = selected().map(byId), plan = [];
+  const st = PRESET[preset].stretch, sets = st ? 1 : +$('sets').value, rest = st ? 5 : +$('rest').value, list = selected().map(byId), plan = [];
   for (let s = 1; s <= sets; s++) for (const e of list) for (const side of (e.sides ? ['左', '右'] : [''])) {
     if (plan.length) plan.push({rest: true, sec: rest});
     plan.push({e, side, set: s, sec: exSec(e)});
@@ -245,9 +292,9 @@ function draw() {
     $('cue').innerHTML = nextW ? nextW.e.how.map(h => `<li>${h}</li>`).join('') : '';
     $('next').textContent = '';
   } else {
-    $('lbl').textContent = `${p.e.group}　${sets > 1 ? p.set + 'セット目' : ''}`;
+    $('lbl').textContent = `${p.e.group}　${sets > 1 && !PRESET[preset].stretch ? p.set + 'セット目' : ''}`;
     $('name').textContent = p.e.name; $('name').className = 'name';
-    $('side').textContent = p.side ? `${p.side}${p.e.id === 'side' ? 'ひじを下に' : p.e.id === 'lunge' ? '足を前に' : '足で'}` : '';
+    $('side').textContent = p.side ? `${p.side}${p.e.sideText ? p.e.sideText : p.e.id === 'side' ? 'ひじを下に' : p.e.id === 'lunge' ? '足を前に' : '足で'}` : '';
     $('ring').className = 'ring';
     if (p.e.type === 'time') { $('big').textContent = Math.ceil(left); $('unit').textContent = '秒'; }
     else { const done = Math.min(p.e.reps, Math.floor((p.sec - left) / p.e.tempo)); $('big').textContent = done; $('unit').textContent = `/ ${p.e.reps}回`; }
@@ -298,7 +345,7 @@ function finish() {
   $('pauseBtn').disabled = true; $('skipBtn').disabled = true;
   const sets = +$('sets').value;
   const parts = selected().map(id => { const e = byId(id); return `${e.name}${e.type === 'time' ? exSec(e) + '秒' : e.reps + '回'}${e.sides ? '（左右）' : ''}`; });
-  $('report').textContent = `体幹やった：${parts.join('・')}　×${sets}セット`;
+  $('report').textContent = PRESET[preset].stretch ? `${PRESET[preset].title}やった：${parts.join('・')}` : `体幹やった：${parts.join('・')}　×${sets}セット`;
   say('おつかれさまでした');
 }
 
